@@ -21,7 +21,7 @@ const mongoUri = process.env.MONGODB_URI;
 if (!mongoUri) {
     console.error("❌ MONGODB_URI çevre değişkeni ayarlanmamış! Lütfen Render'da bu değişkeni tanımlayın.");
     // Eğer yerelde çalışıyorsak, burayı yerel URI ile değiştirebilirsin:
-    // mongoose.connect('mongodb+srv://kayanet_admin:5KRrAwwUBJzLn-v@kayanet.1irxrur.mongodb.net/?retryWrites=true&w=majority&appName=kayanet')
+    mongoose.connect('mongodb+srv://kayanet_admin:5KRrAwwUBJzLn-v@kayanet.1irxrur.mongodb.net/?retryWrites=true&w=majority&appName=kayanet')
 } else {
     mongoose.connect(mongoUri)  
     .then(() => console.log('✅ MongoDB Bağlantısı Başarılı.'))
@@ -164,4 +164,5 @@ app.listen(PORT, () => {
     console.log(`🚀 Sunucu ${PORT} portunda çalışıyor.`);
     console.log(`🔑 Admin Paneli (Sadece Senin İçin): /admin`);
     console.log("----------------------------------------------------");
+
 });
