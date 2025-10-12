@@ -51,7 +51,7 @@
 </head>
 <body>
     <div class="mac-sonucu">
-        <h1>Fenerbahçe - Trabzonspor</h1>
+        <h1>Kayagücü - Adamlargücü</h1>
         
         <!-- SKOR HESAPLAMA EJS KODU (DÜZELTİLDİ) -->
         <% 
@@ -61,11 +61,11 @@
                 // SADECE 'Gol' olaylarını filtrele
                 if (olay.olayTuru === 'Gol') {
                     // YENİ KONTROL: Eğer olayın 'takim' alanı "Fenerbahçe" ise skoru artır
-                    if (olay.takim === 'Fenerbahçe') {
+                    if (olay.takim === 'Kayagücü') {
                         ev_sahibi_skor++;
                     } 
                     // YENİ KONTROL: Eğer olayın 'takim' alanı "Trabzonspor" ise skoru artır
-                    else if (olay.takim === 'Trabzonspor') {
+                    else if (olay.takim === 'Adamlargücü') {
                         deplasman_skor++;
                     }
                 }
@@ -85,9 +85,9 @@
         </div>
         
         <div class="olay-listesi">
-            <!-- Ev Sahibi Olayları (Fenerbahçe) -->
+            <!-- Ev Sahibi Olayları (Kayagücü) -->
             <div class="ev-sahibi-olaylar">
-                <% olaylar.filter(o => o.takim === 'Fenerbahçe').forEach(olay => { %>
+                <% olaylar.filter(o => o.takim === 'Kayagücü').forEach(olay => { %>
                     <div class="oyuncu-olay">
                         <span class="dakika"><%= olay.dakika %>'</span>
                         <span class="ikon <%= olay.olayTuru === 'Gol' ? 'gol-ikonu' : olay.olayTuru.includes('Kirmizi') ? 'kirmizi-kart-ikonu' : olay.olayTuru.includes('Sari') ? 'sari-kart-ikonu' : 'kamera-ikonu' %>">
@@ -100,7 +100,7 @@
             
             <!-- Deplasman Olayları (Trabzonspor) -->
             <div class="deplasman-olaylar">
-                <% olaylar.filter(o => o.takim === 'Trabzonspor').forEach(olay => { %>
+                <% olaylar.filter(o => o.takim === 'Adamlargücü').forEach(olay => { %>
                     <div class="oyuncu-olay">
                         <span class="dakika"><%= olay.dakika %>'</span>
                         <span class="ikon <%= olay.olayTuru === 'Gol' ? 'gol-ikonu' : olay.olayTuru.includes('Kirmizi') ? 'kirmizi-kart-ikonu' : olay.olayTuru.includes('Sari') ? 'sari-kart-ikonu' : 'kamera-ikonu' %>">
@@ -120,3 +120,4 @@
     <script src="/client.js"></script>
 </body>
 </html>
+
