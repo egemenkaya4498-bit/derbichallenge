@@ -4,13 +4,17 @@ self.addEventListener('push', event => {
     const data = event.data.json();
     console.log('Push Bildirimi Alındı', data);
 
+    // Service Worker'ın yüklendiği ana adresi alıyoruz (Render URL'in)
+    const baseUrl = self.location.origin;
+
     const options = {
         body: data.body,
-        // İkon URL'si: Canlı URL'nizi kullanmak en iyisidir, şimdilik placeholder.co'yu kullanmaya devam edebiliriz.
-        icon: 'https://placehold.co/192x192/0056b3/ffffff?text=M', 
+        icon: '${baseUrl}/img/noti.png', 
         vibrate: [100, 50, 100],
+        // YENİ ÖZEL SES ALANI: Ses dosyasının tam yolu
+        // public/sound/noti.mp3 dosyasını projenin ana klasörüne yüklemelisin.
+        sound: `${baseUrl}/sound/noti.mp3`, 
         data: {
-            // DÜZELTME: Artık sabit bir localhost adresi yok. Tarayıcının ana sayfasını açmasını istiyoruz.
             url: self.location.origin // Service Worker'ın yüklendiği ana URL'yi kullan
         }
     };
@@ -25,7 +29,6 @@ self.addEventListener('push', event => {
 self.addEventListener('notificationclick', event => {
     event.notification.close();
     event.waitUntil(
-        // clients.openWindow ile bildirime tıklandığında sayfayı aç
         clients.openWindow(event.notification.data.url)
     );
 });
