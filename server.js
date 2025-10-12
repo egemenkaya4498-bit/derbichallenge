@@ -17,20 +17,9 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public'))); // client.js ve service-worker.js için
 
-// ----------------------------------------------------
-// VERİTABANI BAĞLANTISI VE ŞEMA (MODEL) TANIMLAMA
-// ----------------------------------------------------
-// MongoDB URI'sini ÇEVRE DEĞİŞKENLERİNDEN AL
-const mongoUri = process.env.MONGODB_URI;
-
-if (!mongoUri) {
-    console.error("❌ MONGODB_URI çevre değişkeni ayarlanmamış! Lütfen Render'da bu değişkeni tanımlayın.");
-} else {
-    mongoose.connect(mongoUri)  
+mongoose.connect('mongodb+srv://kayanet_admin:5KRrAwwUBJzLn-v@kayanet.1irxrur.mongodb.net/?retryWrites=true&w=majority&appName=kayanet')
     .then(() => console.log('✅ MongoDB Bağlantısı Başarılı.'))
-    .catch(err => console.error('❌ MongoDB Bağlantı Hatası: ', err));
-}
-
+    .catch(err => console.error('❌ MongoDB Bağlantı Hatası: Lütfen MongoDB Server’ının çalıştığından emin olun.', err));
 
 const OlaySchema = new mongoose.Schema({
     macAdi: { type: String, required: true },
@@ -176,4 +165,5 @@ app.listen(PORT, () => {
     console.log(`🔑 Admin Paneli (Sadece Senin İçin): /admin`);
     console.log("----------------------------------------------------");
 });
+
 
