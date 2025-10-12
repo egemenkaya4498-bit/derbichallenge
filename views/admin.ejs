@@ -48,7 +48,7 @@
         <form action="/api/olay-ekle" method="POST">
             <h2>Yeni Maç Olayı (Gol/Kart/Kadrolar)</h2>
             
-            <label for="macAdi">Maç Adı (Bildirim Metni İçin):</label>
+            <label for="macAdi">Maç Adı:</label>
             <input type="text" id="macAdi" name="macAdi" value="Fenerbahçe - Trabzonspor" required>
 
             <label for="olayTuru">Olay Türü:</label>
@@ -60,19 +60,18 @@
             </select>
             
                         <label for="takim">Olay Hangi Takım İçin:</label>
-            <select id="takim" name="takim" required>
+            <select id="takim" name="takim" required onchange="updatePlayerList()">
                 <option value="Fenerbahçe">Fenerbahçe</option>
                 <option value="Trabzonspor">Trabzonspor</option>
                 <option value="Genel">Genel (Kadrolar, Maç Başladı vb.)</option>
             </select>
 
-            <label for="dakika">Dakika (Kadrolar için 0 veya boş bırakılabilir):</label>
-            <input type="number" id="dakika" name="dakika" min="0" max="120">
+            <label for="dakika">Dakika (Kadrolar için 0):</label>
+            <input type="number" id="dakika" name="dakika" min="0" max="120" value="0">
             
-                        <label for="oyuncu">Oyuncu Adı (Genel Olaylar İçin Boş Bırakın):</label>
-            <select id="oyuncu" name="oyuncu">
-                <option value="">-- Takımı Seçiniz --</option>
-            </select>
+                        <label for="oyuncu">Oyuncu Adı (Genel için boş bırakın):</label>
+            <select id="oyuncu" name="oyuncu" required>
+                            </select>
             
             <button type="submit" class="olay-gonder-btn">Olayı Kaydet ve Kullanıcılara Bildirim Gönder</button>
         </form>
@@ -81,78 +80,62 @@
         <h2>Veritabanı Yönetimi</h2>
         
         <div class="subs-info">
-            Aktif Abone Sayısı (Bildirim Gönderilecek Kişi): **<%= subscriptionsCount %>**
+            Aktif Abone Sayısı: **<%= subscriptionsCount %>**
         </div>
         
-                <button class="reset-btn" id="resetBtn">🚨 TÜM MAÇ OYLARINI SIFIRLA (DİKKATLİ OL)</button>
+        <button class="reset-btn" id="resetBtn">🚨 TÜM MAÇ OYLARINI SIFIRLA (DİKKATLİ OL)</button>
     </div>
 
     <script>
-        // Oyuncu listeleri (Senin verdiğin isimlere göre düzenlendi)
-        const oyuncuListeleri = {
-            'Fenerbahçe': [
-                "Kerem Aktürkoğlu", 
-                "Edson Alvarez", 
-                "Marco Asensio", 
-                "Ederson",
-                "Fred",
-                "İrfan Can Eğribayat",
-                "Dorgeles Nene",
-                "İrfan Can Kahveci",
-                "Anderson Talisca",
-                "Youssef En-Nesryi"
-            ],
-            'Trabzonspor': [
-                "Andre Onana", 
-                "Edin Visca", 
-                "Paul Onuachu", 
-                "Felipe Augusto", 
-                "Trezeguet",
-                "Ernest Muci",
-                "Anthony Nwakaeme"
-            ],
-            'Genel': [""] // Genel olaylar için oyuncu seçimine gerek yok
-        };
+        // Oyuncu Listeleri
+        const playerLists = {
+            'Fenerbahçe': [
+                'Youssef En-Nesyri',
+                'Okay Yokuşlu',
+                // Ekstra Oyuncular
+                'Serdar Saatçı',
+                'Berkay Yılmaz',
+                'Dusan Tadic',
+                'Edin Dzeko'
+            ],
+            'Trabzonspor': [
+                'Andre Onana',
+                'Edin Visca',
+                // Ekstra Oyuncular
+                'Umut Bozok',
+                'Anastásios Bakasétas',
+                'Trezeguet',
+                'Enis Bardhi'
+            ]
+        };
 
-        const takimSelect = document.getElementById('takim');
-        const oyuncuSelect = document.getElementById('oyuncu');
-        const olayTuruSelect = document.getElementById('olayTuru');
+        const takimSelect = document.getElementById('takim');
+        const oyuncuSelect = document.getElementById('oyuncu');
 
-        function updateOyuncuListesi() {
-            const secilenTakim = takimSelect.value;
-            const secilenOlayTuru = olayTuruSelect.value;
-            const oyuncular = oyuncuListeleri[secilenTakim] || [];
+        // Oyuncu listesini güncelleyen fonksiyon
+        function updatePlayerList() {
+            const selectedTeam = takimSelect.value;
+            oyuncuSelect.innerHTML = ''; // Önce tüm seçenekleri temizle
 
-            // Oyuncu selectbox'ını temizle
-            oyuncuSelect.innerHTML = ''; 
+            if (selectedTeam === 'Genel') {
+                oyuncuSelect.innerHTML = '<option value="">(Genel Olay)</option>';
+                oyuncuSelect.required = false;
+            } else {
+                oyuncuSelect.required = true;
+                const players = playerLists[selectedTeam] || [];
+                players.forEach(player => {
+                    const option = document.createElement('option');
+                    option.value = player;
+                    option.textContent = player;
+                    oyuncuSelect.appendChild(option);
+                });
+            }
+        }
 
-            if (secilenTakim === 'Genel' || secilenOlayTuru === 'Kadrolar Açıklandı') {
-                // Genel veya kadrolar olayında oyuncu seçimine gerek yok
-                oyuncuSelect.innerHTML = '<option value="">-- Oyuncu Seçimine Gerek Yok --</option>';
-                oyuncuSelect.disabled = true;
-                return;
-            }
+        // Sayfa yüklendiğinde listeyi bir kez çalıştır
+        updatePlayerList(); 
 
-            // Normal olaylarda oyuncu listesini doldur
-            oyuncuSelect.disabled = false;
-            oyuncuSelect.innerHTML = '<option value="">-- Oyuncu Seçiniz --</option>'; 
-            oyuncular.forEach(oyuncu => {
-                const option = document.createElement('option');
-                option.value = oyunc;
-                option.textContent = oyunc;
-                oyuncuSelect.appendChild(option);
-            });
-        }
-
-        // Takım ve Olay türü değiştiğinde listeyi güncelle
-        takimSelect.addEventListener('change', updateOyuncuListesi);
-        olayTuruSelect.addEventListener('change', updateOyuncuListesi);
-
-        // Sayfa yüklendiğinde ilk listeyi ayarla
-        document.addEventListener('DOMContentLoaded', updateOyuncuListesi);
-
-
-        // SIFIRLA BUTONU FONKSİYONLARI (Kendi kodun)
+        // SIFIRLAMA BUTONU JS'si
         document.getElementById('resetBtn').addEventListener('click', async () => {
             const onay = prompt("TÜM MAÇ OLAYLARINI SİLMEK İSTEDİĞİNE EMİN MİSİN? Evet ise 'SIL' yazıp Onayla.");
 
@@ -160,9 +143,7 @@
                 try {
                     const response = await fetch('/api/sifirla', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ confirm: true }) 
                     });
 
