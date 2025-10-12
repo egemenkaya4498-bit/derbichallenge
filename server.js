@@ -65,7 +65,7 @@ webpush.setVapidDetails(
 // 1. ANA SAYFA ROTASI
 app.get('/', async (req, res) => {
     try {
-        const olaylar = await MacOlay.find({ macAdi: 'Fenerbahçe - Trabzonspor' }).sort({ dakika: 1 });
+        const olaylar = await MacOlay.find({ macAdi: 'Adamlargücü - Kayagücü' }).sort({ dakika: 1 });
         res.render('index', { olaylar: olaylar }); 
     } catch (error) {
         console.error("Olaylar çekilemedi: ", error);
@@ -166,3 +166,4 @@ app.listen(PORT, () => {
     console.log("----------------------------------------------------");
 
 });
+
