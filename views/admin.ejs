@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sana Özel Admin Paneli | Maç Olay Girişi</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #0056b3; }
+        h2 { border-bottom: 2px solid #eee; padding-bottom: 5px; margin-top: 30px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        
+        /* Olay Ekleme Butonu */
+        .olay-gonder-btn { 
+            background-color: #0056b3; 
+            color: white; 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            width: 100%;
+        }
+        .olay-gonder-btn:hover { background-color: #004494; }
+
+        .subs-info { text-align: center; font-size: 1.1em; font-weight: bold; color: #10b981; padding: 10px; border: 1px dashed #10b98150; margin-top: 15px; }
+
+        /* Sıfırlama Butonu */
+        .reset-btn {
+            background-color: #ef4444; /* Kırmızı renk tehlikeyi belirtir */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            font-weight: bold;
+        }
+        .reset-btn:hover { background-color: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EGEMEN'İN ÖZEL MAÇ KONTROL PANELİ</h1>
+        
+        <form action="/api/olay-ekle" method="POST">
+            <h2>Yeni Maç Olayı (Gol/Kart/Kadrolar)</h2>
+            
+            <label for="macAdi">Maç Adı (Bildirim Metni İçin):</label>
+            <input type="text" id="macAdi" name="macAdi" value="Fenerbahçe - Trabzonspor" required>
+
+            <label for="olayTuru">Olay Türü:</label>
+            <select id="olayTuru" name="olayTuru" required>
+                <option value="Gol">⚽ Gol</option>
+                <option value="Kirmizi Kart">🟥 Kırmızı Kart</option>
+                <option value="Sari Kart">🟨 Sarı Kart</option>
+                <option value="Kadrolar Açıklandı">👕 Kadrolar Açıklandı</option>
+            </select>
+            
+            <!-- TAKIM SEÇENEĞİ -->
+            <label for="takim">Olay Hangi Takım İçin:</label>
+            <select id="takim" name="takim" required>
+                <option value="Fenerbahçe">Fenerbahçe</option>
+                <option value="Trabzonspor">Trabzonspor</option>
+                <option value="Genel">Genel (Kadrolar, Maç Başladı vb.)</option>
+            </select>
+
+            <label for="dakika">Dakika (Kadrolar için 0 veya boş bırakılabilir):</label>
+            <input type="number" id="dakika" name="dakika" min="0" max="120">
+            
+            <label for="oyuncu">Oyuncu Adı (Kadrolar için boş bırakın):</label>
+            <input type="text" id="oyuncu" name="oyuncu">
+            
+            <button type="submit" class="olay-gonder-btn">Olayı Kaydet ve Kullanıcılara Bildirim Gönder</button>
+        </form>
+
+        <hr style="margin-top: 30px;">
+        <h2>Veritabanı Yönetimi</h2>
+        
+        <div class="subs-info">
+            Aktif Abone Sayısı (Bildirim Gönderilecek Kişi): **<%= subscriptionsCount %>**
+        </div>
+        
+        <!-- YENİ: SIFIRLA TUŞU -->
+        <button class="reset-btn" id="resetBtn">🚨 TÜM MAÇ OYLARINI SIFIRLA (DİKKATLİ OL)</button>
+        
+    </div>
+
+    <script>
+        document.getElementById('resetBtn').addEventListener('click', async () => {
+            // UYARI: confirm() kullanmak yerine (Canvas platformunda yasak) 
+            // şimdilik basit bir JavaScript onayı kullanıyoruz.
+            const onay = prompt("TÜM MAÇ OLAYLARINI SİLMEK İSTEDİĞİNE EMİN MİSİN? Evet ise 'SIL' yazıp Onayla.");
+
+            if (onay === 'SIL') {
+                try {
+                    const response = await fetch('/api/sifirla', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        // Güvenlik için basit bir onay verisi gönderiyoruz
+                        body: JSON.stringify({ confirm: true }) 
+                    });
+
+                    if (response.ok) {
+                        alert("✅ Tüm maç olayları başarıyla silindi. Sayfa yenileniyor.");
+                        window.location.reload();
+                    } else {
+                        alert("❌ Sıfırlama işleminde bir hata oluştu.");
+                    }
+                } catch (error) {
+                    alert("❌ Sunucuya erişimde hata: " + error.message);
+                }
+            } else {
+                alert("İşlem iptal edildi.");
+            }
+        });
+    </script>
+</body>
+</html>
