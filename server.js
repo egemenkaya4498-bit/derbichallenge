@@ -94,7 +94,7 @@ app.post('/api/subscribe', async (req, res) => {
 });
 
 // 3. ADMIN PANELİ ROTASI
-app.get('/admin', async (req, res) => {
+app.get('/admin/passwordEkEgemen123', async (req, res) => {
     try {
         const subscriptionsCount = await PushSubscription.countDocuments();
         res.render('admin', { subscriptionsCount: subscriptionsCount });
@@ -139,7 +139,7 @@ app.post('/api/olay-ekle', async (req, res) => {
         await Promise.all(bildirimVaatleri);
 
         console.log(`🚀 Bildirim gönderildi: ${notificationTitle}`);
-        res.redirect('/admin');
+        res.redirect('/admin/passwordEkEgemen123');
         
     } catch (error) {
         console.error('Olay ekleme veya bildirim gönderme hatası:', error);
@@ -166,5 +166,6 @@ app.listen(PORT, () => {
     console.log("----------------------------------------------------");
 
 });
+
 
 
