@@ -15,18 +15,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(express.static(path.join(__dirname, 'public'))); // client.js ve service-worker.js için
+app.use(express.static(path.join(__dirname, 'public')));
+const mongoUri = process.env.MONGODB_URI;
 
-mongoose.connect('mongodb+srv://kayanet_admin:5KRrAwwUBJzLn-v@kayanet.1irxrur.mongodb.net/?retryWrites=true&w=majority&appName=kayanet')
+if (!mongoUri) {
+    console.error("❌ MONGODB_URI çevre değişkeni ayarlanmamış! Lütfen Render'da bu değişkeni tanımlayın.");
+    // Eğer yerelde çalışıyorsak, burayı yerel URI ile değiştirebilirsin:
+    // mongoose.connect('mongodb+srv://kayanet_admin:5KRrAwwUBJzLn-v@kayanet.1irxrur.mongodb.net/?retryWrites=true&w=majority&appName=kayanet')
+} else {
+    mongoose.connect(mongoUri)  
     .then(() => console.log('✅ MongoDB Bağlantısı Başarılı.'))
-    .catch(err => console.error('❌ MongoDB Bağlantı Hatası: Lütfen MongoDB Server’ının çalıştığından emin olun.', err));
+    .catch(err => console.error('❌ MongoDB Bağlantı Hatası: Lütfen MONGODB_URI ve MongoDB Atlas Ağ Erişimi ayarlarınızı kontrol edin.', err));
+}
+
 
 const OlaySchema = new mongoose.Schema({
     macAdi: { type: String, required: true },
     dakika: { type: Number, required: true },
     oyuncu: { type: String, required: true },
-    olayTuru: { type: String, required: true }, // "Gol", "Kirmizi Kart", "Kadrolar Açıklandı"
-    takim: { type: String, required: true }, // "Fenerbahçe", "Trabzonspor" vb.
+    olayTuru: { type: String, required: true },
+    takim: { type: String, required: true }, 
     createdAt: { type: Date, default: Date.now }
 });
 const MacOlay = mongoose.model('MacOlay', OlaySchema);
@@ -45,15 +53,16 @@ const PushSubscription = mongoose.model('PushSubscription', SubscriptionSchema);
 // VAPID KEY'leri ÇEVRE DEĞİŞKENLERİNDEN AL
 webpush.setVapidDetails(
     'mailto:egemenkaya4498@gmail.com',
-    'BGJ9SBzyXTViPfTsW-sEak30q3vpkdNtU_jJQldZV5FAhulk19S9axz7_aOWUAbRbmshu3wLbQQo4Bv22u1AQ7E', 
-    'YRM-UShAmpJn7lfsfbA4E22_fuXbYC0r0RTCG5zsNow'
+    process.env.VAPID_PUBLIC_KEY || 'BJf7f86K9hvKhUlLWJD7vYEKYz-L0bPoAk970Sq5vUbqGH7IBS3pohfD3yISoO0csGB7_V8AwRFiJwzI9G8C9cQ', 
+    process.env.VAPID_PRIVATE_KEY || 'A6WEygRmhseSlza202UrI0qslh6gs19EZ9foLhvbbEs' 
 );
 
 // ----------------------------------------------------
 // ROTLAR (Routes)
 // ----------------------------------------------------
 
-// 1. ANA SAYFA ROTASI (Kullanıcıların Gördüğü Yer)
+// ... (ROTALAR - Önceki kodun aynısı) ...
+// 1. ANA SAYFA ROTASI
 app.get('/', async (req, res) => {
     try {
         const olaylar = await MacOlay.find({ macAdi: 'Fenerbahçe - Trabzonspor' }).sort({ dakika: 1 });
@@ -84,7 +93,7 @@ app.post('/api/subscribe', async (req, res) => {
     }
 });
 
-// 3. ADMIN PANELİ ROTASI (Sana Özel Panel)
+// 3. ADMIN PANELİ ROTASI
 app.get('/admin', async (req, res) => {
     try {
         const subscriptionsCount = await PushSubscription.countDocuments();
@@ -98,16 +107,11 @@ app.get('/admin', async (req, res) => {
 // 4. OLAY EKLEME VE BİLDİRİM GÖNDERME API'SI
 app.post('/api/olay-ekle', async (req, res) => {
     const { dakika, oyuncu, olayTuru, macAdi, takim } = req.body; 
-
-    // 1. Olayı Veritabanına Kaydetme
     try {
         const yeniOlay = new MacOlay({ dakika, oyuncu, olayTuru, macAdi, takim });
         await yeniOlay.save();
-
-        // 2. Tüm aboneleri DB'den çek
         const subscriptions = await PushSubscription.find({});
         
-        // 3. BİLDİRİM İÇERİĞİNİ OLUŞTUR
         let notificationTitle = '';
         let notificationBody = '';
 
@@ -121,12 +125,10 @@ app.post('/api/olay-ekle', async (req, res) => {
         
         const payload = JSON.stringify({ title: notificationTitle, body: notificationBody });
 
-        // 4. TÜM ABONELERE BİLDİRİM GÖNDER
         const bildirimVaatleri = subscriptions.map(sub => 
             webpush.sendNotification(sub.toObject(), payload)
                 .catch(err => {
                     if (err.statusCode === 410) {
-                        // Abonelik süresi dolmuş veya geçersizse DB'den sil
                         return PushSubscription.deleteOne({ endpoint: sub.endpoint });
                     }
                     console.error('Bildirim gönderilemedi:', err.statusCode, sub.endpoint);
@@ -144,12 +146,10 @@ app.post('/api/olay-ekle', async (req, res) => {
         res.status(500).send("Olay eklenirken hata oluştu.");
     }
 });
-
-
 // 5. TÜM MAÇ OLAYLARINI SIFIRLAMA API'SI
 app.post('/api/sifirla', async (req, res) => {
     try {
-        const result = await MacOlay.deleteMany({}); // Koleksiyondaki tüm belgeleri sil
+        const result = await MacOlay.deleteMany({});
         console.log(`🗑️ Veritabanı Sıfırlandı! Silinen olay sayısı: ${result.deletedCount}`);
         res.status(200).json({ success: true, message: `${result.deletedCount} olay silindi.` });
     } catch (error) {
@@ -158,12 +158,10 @@ app.post('/api/sifirla', async (req, res) => {
     }
 });
 
-
 // Sunucuyu başlat (Artık dinamik PORT kullanıyoruz)
 app.listen(PORT, () => {
+    // Render'da portu yazdırır, yerelde localhost'u
     console.log(`🚀 Sunucu ${PORT} portunda çalışıyor.`);
     console.log(`🔑 Admin Paneli (Sadece Senin İçin): /admin`);
     console.log("----------------------------------------------------");
 });
-
-
