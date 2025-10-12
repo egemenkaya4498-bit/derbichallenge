@@ -56,8 +56,8 @@ const PushSubscription = mongoose.model('PushSubscription', SubscriptionSchema);
 // VAPID KEY'leri ÇEVRE DEĞİŞKENLERİNDEN AL
 webpush.setVapidDetails(
     'mailto:egemenkaya4498@gmail.com',
-    process.env.VAPID_PUBLIC_KEY, 
-    process.env.VAPID_PRIVATE_KEY 
+    'BGJ9SBzyXTViPfTsW-sEak30q3vpkdNtU_jJQldZV5FAhulk19S9axz7_aOWUAbRbmshu3wLbQQo4Bv22u1AQ7E', 
+    'YRM-UShAmpJn7lfsfbA4E22_fuXbYC0r0RTCG5zsNow'
 );
 
 // ----------------------------------------------------
@@ -176,3 +176,4 @@ app.listen(PORT, () => {
     console.log(`🔑 Admin Paneli (Sadece Senin İçin): /admin`);
     console.log("----------------------------------------------------");
 });
+
