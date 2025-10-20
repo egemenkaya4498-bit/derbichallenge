@@ -51,7 +51,7 @@
 </head>
 <body>
     <div class="mac-sonucu">
-        <h1>Fenerbahçe - Trabzonspor</h1>
+        <h1>Villareal - Manchester City</h1>
         
         <!-- SKOR HESAPLAMA EJS KODU (DÜZELTİLDİ) -->
         <% 
@@ -60,12 +60,12 @@
             olaylar.forEach(olay => {
                 // SADECE 'Gol' olaylarını filtrele
                 if (olay.olayTuru === 'Gol') {
-                    // YENİ KONTROL: Eğer olayın 'takim' alanı "Fenerbahçe" ise skoru artır
-                    if (olay.takim === 'Fenerbahçe') {
+                    // YENİ KONTROL: Eğer olayın 'takim' alanı "Villareal" ise skoru artır
+                    if (olay.takim === 'Villareal') {
                         ev_sahibi_skor++;
                     } 
-                    // YENİ KONTROL: Eğer olayın 'takim' alanı "Trabzonspor" ise skoru artır
-                    else if (olay.takim === 'Trabzonspor') {
+                    // YENİ KONTROL: Eğer olayın 'takim' alanı "Manchester City" ise skoru artır
+                    else if (olay.takim === 'Manchester City') {
                         deplasman_skor++;
                     }
                 }
@@ -85,9 +85,9 @@
         </div>
         
         <div class="olay-listesi">
-            <!-- Ev Sahibi Olayları (Fenerbahçe) -->
+            <!-- Ev Sahibi Olayları (Villareal) -->
             <div class="ev-sahibi-olaylar">
-                <% olaylar.filter(o => o.takim === 'Fenerbahçe').forEach(olay => { %>
+                <% olaylar.filter(o => o.takim === 'Villareal').forEach(olay => { %>
                     <div class="oyuncu-olay">
                         <span class="dakika"><%= olay.dakika %>'</span>
                         <span class="ikon <%= olay.olayTuru === 'Gol' ? 'gol-ikonu' : olay.olayTuru.includes('Kirmizi') ? 'kirmizi-kart-ikonu' : olay.olayTuru.includes('Sari') ? 'sari-kart-ikonu' : 'kamera-ikonu' %>">
@@ -98,9 +98,9 @@
                 <% }); %>
             </div>
             
-            <!-- Deplasman Olayları (Trabzonspor) -->
+            <!-- Deplasman Olayları (Manchester City) -->
             <div class="deplasman-olaylar">
-                <% olaylar.filter(o => o.takim === 'Trabzonspor').forEach(olay => { %>
+                <% olaylar.filter(o => o.takim === 'Manchester City').forEach(olay => { %>
                     <div class="oyuncu-olay">
                         <span class="dakika"><%= olay.dakika %>'</span>
                         <span class="ikon <%= olay.olayTuru === 'Gol' ? 'gol-ikonu' : olay.olayTuru.includes('Kirmizi') ? 'kirmizi-kart-ikonu' : olay.olayTuru.includes('Sari') ? 'sari-kart-ikonu' : 'kamera-ikonu' %>">
@@ -120,3 +120,4 @@
     <script src="/client.js"></script>
 </body>
 </html>
+
