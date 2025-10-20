@@ -49,7 +49,7 @@
             <h2>Yeni Maç Olayı (Gol/Kart/Kadrolar)</h2>
             
             <label for="macAdi">Maç Adı:</label>
-            <input type="text" id="macAdi" name="macAdi" value="Fenerbahçe - Trabzonspor" required>
+            <input type="text" id="macAdi" name="macAdi" value="Villareal - Manchester City" required>
 
             <label for="olayTuru">Olay Türü:</label>
             <select id="olayTuru" name="olayTuru" required>
@@ -61,8 +61,8 @@
             
                         <label for="takim">Olay Hangi Takım İçin:</label>
             <select id="takim" name="takim" required onchange="updatePlayerList()">
-                <option value="Fenerbahçe">Fenerbahçe</option>
-                <option value="Trabzonspor">Trabzonspor</option>
+                <option value="Villareal">Villareal</option>
+                <option value="Manchester City">Manchester City</option>
                 <option value="Genel">Genel (Kadrolar, Maç Başladı vb.)</option>
             </select>
 
@@ -89,7 +89,7 @@
     <script>
         // Oyuncu Listeleri
         const playerLists = {
-            'Fenerbahçe': [
+            'Villareal': [
                 'Youssef En-Nesyri',
                 'Okay Yokuşlu',
                 // Ekstra Oyuncular
@@ -98,7 +98,7 @@
                 'Dusan Tadic',
                 'Edin Dzeko'
             ],
-            'Trabzonspor': [
+            'Manchester City': [
                 'Andre Onana',
                 'Edin Visca',
                 // Ekstra Oyuncular
@@ -163,3 +163,4 @@
     </script>
 </body>
 </html>
+
