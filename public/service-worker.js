@@ -13,7 +13,7 @@ self.addEventListener('push', event => {
         vibrate: [100, 50, 100],
         // YENİ ÖZEL SES ALANI: Ses dosyasının tam yolu
         // public/sound/noti.mp3 dosyasını projenin ana klasörüne yüklemelisin.
-        sound: `${baseUrl}/sound/noti.mp3`, 
+        sound: `${baseUrl}/sounds/noti.mp3`, 
         data: {
             url: self.location.origin // Service Worker'ın yüklendiği ana URL'yi kullan
         }
@@ -31,4 +31,5 @@ self.addEventListener('notificationclick', event => {
     event.waitUntil(
         clients.openWindow(event.notification.data.url)
     );
+
 });
